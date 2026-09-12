@@ -1,0 +1,106 @@
+/* Shared shell for every page: tokens, type, masthead, buttons, footer.
+   Page-specific components stay in the page that uses them. */
+
+/* ─── Tokens ────────────────────────────────────────────────────────────────
+   Taken from the app itself, not invented: the oxblood of the icon, the gold
+   of its ornament, and the seventeen tajweed hues exactly as the reader
+   draws them.                                                              */
+:root{
+  --ox-deep:#150208;
+  --ox:#23050d;
+  --ox-lift:#360a17;
+  --ox-edge:#4a1223;
+
+  --gold:#d8ab53;
+  --gold-bright:#f2dda4;
+  --gold-dim:#8f7134;
+
+  --ink:#f4e9d8;
+  --body:#c3ab91;
+  --faint:#8e7860;
+
+  --display:'Amiri',Georgia,'Times New Roman',serif;
+  --text:'Alegreya Sans',system-ui,-apple-system,sans-serif;
+
+  --folio:min(1200px,100% - 3rem);
+  --measure:64ch;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+body{
+  margin:0;
+  background:var(--ox-deep);
+  color:var(--ink);
+  font-family:var(--text);
+  font-weight:300;
+  font-size:17px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit}
+img{max-width:100%;display:block}
+
+.folio{width:var(--folio);margin-inline:auto}
+
+/* The page is set as a folio: a wide text column with a narrow margin beside
+   it, the way a mushaf carries its juz and hizb marks in the margin. The
+   margin is not decoration — it holds the marks. */
+.leaf{display:grid;grid-template-columns:4.5rem minmax(0,1fr);gap:0 1.75rem}
+.margin{
+  font-family:var(--display);
+  color:var(--gold-dim);
+  font-size:1.45rem;
+  line-height:1;
+  padding-top:.55rem;
+  text-align:right;
+  user-select:none;
+}
+.margin small{display:none}
+
+h1,h2,h3{font-family:var(--display);font-weight:400;color:#fffaf0;margin:0}
+h1{font-size:clamp(2.6rem,6vw,4.6rem);line-height:1.06;letter-spacing:-.01em}
+h2{font-size:clamp(1.9rem,3.4vw,2.9rem);line-height:1.14;margin-bottom:.75rem}
+h3{font-size:1.3rem;line-height:1.3}
+p{margin:0 0 1.1rem;max-width:var(--measure)}
+.lede{font-size:1.16rem;color:var(--body);line-height:1.72}
+.quiet{color:var(--body)}
+
+section{padding:clamp(4rem,9vw,7.5rem) 0;position:relative}
+
+/* A gold rule that thins to nothing, like a ruled manuscript border. */
+.rule{height:1px;border:0;margin:0;
+  background:linear-gradient(90deg,transparent,var(--gold-dim) 12%,var(--gold) 50%,var(--gold-dim) 88%,transparent);
+  opacity:.5}
+
+/* ─── Masthead ─────────────────────────────────────────────────────────── */
+.masthead{position:sticky;top:0;z-index:40;backdrop-filter:blur(14px);
+  background:color-mix(in srgb,var(--ox-deep) 84%,transparent);
+  border-bottom:1px solid color-mix(in srgb,var(--gold) 16%,transparent)}
+.masthead .bar{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;height:4.2rem}
+.wordmark{display:flex;align-items:center;gap:.7rem;font-family:var(--display);font-size:1.2rem;
+  letter-spacing:.01em;text-decoration:none}
+.wordmark img{width:2.1rem;height:2.1rem;border-radius:.5rem}
+.masthead nav{display:flex;gap:1.6rem;font-size:.95rem;color:var(--body)}
+.masthead nav a{text-decoration:none;padding:.2rem 0;border-bottom:1px solid transparent;transition:border-color .18s,color .18s}
+.masthead nav a:hover,.masthead nav a:focus-visible{color:var(--gold-bright);border-bottom-color:var(--gold)}
+
+/* ─── Buttons ──────────────────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:.55rem;padding:.85rem 1.5rem;border-radius:.5rem;
+  font-family:var(--text);font-size:1rem;font-weight:500;text-decoration:none;border:1px solid transparent;
+  cursor:pointer;transition:transform .16s ease,box-shadow .16s ease,background .16s}
+.btn-gold{background:linear-gradient(177deg,var(--gold-bright),var(--gold));color:#2b1a06;
+  box-shadow:0 .5rem 1.6rem color-mix(in srgb,var(--gold) 26%,transparent)}
+.btn-gold:hover{transform:translateY(-1px);box-shadow:0 .75rem 2rem color-mix(in srgb,var(--gold) 34%,transparent)}
+.btn-quiet{border-color:color-mix(in srgb,var(--gold) 38%,transparent);color:var(--ink);background:none}
+.btn-quiet:hover{background:color-mix(in srgb,var(--gold) 9%,transparent)}
+:focus-visible{outline:2px solid var(--gold-bright);outline-offset:3px;border-radius:.25rem}
+
+footer{padding:3rem 0 4rem;color:var(--faint);font-size:.92rem}
+.foot{display:flex;justify-content:space-between;gap:1.2rem;flex-wrap:wrap;align-items:center}
+.foot nav{display:flex;gap:1.5rem}
+.foot a{text-decoration:none}
+.foot a:hover{color:var(--gold-bright)}
+

@@ -1,0 +1,922 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Noble Quran</title>
+<meta name="description" content="A Quran reader for iPhone, set the way a manuscript is set. Tajweed coloured into the letters, word-by-word recitation, and a cover that records every day you read.">
+<link rel="icon" href="img/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Alegreya+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+/* ─── The phone ────────────────────────────────────────────────────────────
+   Drawn rather than an image, so the bezel stays crisp at any size and the
+   screen can hold live content as easily as a screenshot. */
+.phone{position:relative;width:var(--w,270px);aspect-ratio:1206/2622;flex:none;
+  border-radius:calc(var(--w,270px)/7.4);
+  padding:calc(var(--w,270px)/48);
+  background:linear-gradient(155deg,#4a4a52,#131316 28%,#0a0a0c 62%,#3a3a42);
+  box-shadow:0 2.2rem 4.5rem rgba(0,0,0,.72), 0 0 0 1px rgba(255,255,255,.06);}
+.phone-screen{position:relative;width:100%;height:100%;overflow:hidden;background:#000;
+  border-radius:calc(var(--w,270px)/9.2)}
+.phone-screen img{width:100%;height:100%;object-fit:cover;object-position:top}
+.phone-island{position:absolute;top:calc(var(--w,270px)/26);left:50%;transform:translateX(-50%);
+  width:30%;height:calc(var(--w,270px)/11.5);background:#000;border-radius:999px;z-index:3}
+
+/* ─── Hero ─────────────────────────────────────────────────────────────── */
+.hero{padding-top:clamp(3rem,7vw,5.5rem);padding-bottom:clamp(3.5rem,8vw,6rem);overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.03fr) minmax(0,.97fr);
+  gap:clamp(2rem,5vw,4.5rem);align-items:center}
+.hero h1{margin-bottom:1.4rem}
+.hero .lede{margin-bottom:2rem}
+.hero-cta{display:flex;gap:.9rem;flex-wrap:wrap;align-items:center}
+.hero-note{margin-top:1.2rem;font-size:.92rem;color:var(--faint)}
+
+.stage{position:relative;display:flex;justify-content:center;align-items:center}
+.stage::before{content:"";position:absolute;width:min(34rem,120%);aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--gold) 22%,transparent),transparent 70%);
+  filter:blur(6px)}
+
+/* The cover canvas sits where a screenshot would, and is the same artwork the
+   app draws — lit the same way. */
+#coverCanvas{width:100%;height:100%;display:block}
+
+/* The scrubber: the one interactive control in the hero. */
+.scrub{margin-top:1.9rem;max-width:30rem}
+.scrub-head{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin-bottom:.55rem}
+.scrub-metal{font-family:var(--display);font-size:1.5rem;color:var(--gold-bright)}
+.scrub-step{font-size:.9rem;color:var(--faint)}
+.scrub input[type=range]{width:100%;appearance:none;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,var(--gold) var(--pct,0%),color-mix(in srgb,var(--gold) 20%,transparent) var(--pct,0%));
+  outline-offset:6px;cursor:pointer}
+.scrub input[type=range]::-webkit-slider-thumb{appearance:none;width:1.05rem;height:1.05rem;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#fff3d4,var(--gold));border:0;
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--gold) 18%,transparent)}
+.scrub input[type=range]::-moz-range-thumb{width:1.05rem;height:1.05rem;border-radius:50%;border:0;
+  background:radial-gradient(circle at 35% 30%,#fff3d4,var(--gold))}
+.scrub-caption{margin-top:.7rem;font-size:.92rem;color:var(--faint);max-width:32ch}
+
+/* ─── Layer demo ───────────────────────────────────────────────────────── */
+.verse-panel{background:linear-gradient(180deg,var(--ox-lift),var(--ox));
+  border:1px solid color-mix(in srgb,var(--gold) 24%,transparent);border-radius:1rem;
+  padding:clamp(1.4rem,3vw,2.2rem)}
+.ayah{font-family:var(--display);font-size:clamp(1.7rem,3.4vw,2.35rem);line-height:2.1;
+  direction:rtl;text-align:right;color:var(--ink);margin-bottom:.9rem}
+.layer-line{color:var(--body);font-size:1rem;line-height:1.6;margin:.45rem 0 0;
+  max-width:none;overflow:hidden;transition:opacity .22s ease}
+.layer-line[hidden]{display:none}
+.translit{font-style:italic;color:var(--faint)}
+.switches{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:1.5rem}
+.sw{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem .9rem;border-radius:999px;cursor:pointer;
+  border:1px solid color-mix(in srgb,var(--gold) 26%,transparent);background:none;color:var(--body);
+  font-family:var(--text);font-size:.95rem;transition:background .18s,color .18s,border-color .18s}
+.sw .dot{width:.55rem;height:.55rem;border-radius:50%;background:color-mix(in srgb,var(--gold) 32%,transparent);
+  transition:background .18s,box-shadow .18s}
+.sw[aria-pressed=true]{color:var(--gold-bright);border-color:var(--gold);
+  background:color-mix(in srgb,var(--gold) 11%,transparent)}
+.sw[aria-pressed=true] .dot{background:var(--gold-bright);box-shadow:0 0 .5rem var(--gold)}
+
+/* ─── Tajweed demo ─────────────────────────────────────────────────────── */
+.tajweed-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);
+  gap:clamp(1.6rem,4vw,3.2rem);align-items:start}
+.tajweed-verse{font-family:var(--display);direction:rtl;text-align:right;
+  font-size:clamp(1.6rem,3.2vw,2.3rem);line-height:2.15}
+.tajweed-verse .v{display:block;margin-bottom:.9rem}
+.tajweed-verse mark{background:none;color:inherit;border-radius:.15rem;padding:0 .04em;
+  transition:background .2s ease,opacity .2s ease}
+.tajweed-verse.dimmed mark:not(.lit){opacity:.28}
+.tajweed-verse.dimmed .plain{opacity:.28}
+.tajweed-verse mark.lit{background:color-mix(in srgb,currentColor 17%,transparent)}
+.keylist{display:flex;flex-direction:column;gap:.1rem;border-top:1px solid color-mix(in srgb,var(--gold) 18%,transparent)}
+.keyrow{display:grid;grid-template-columns:5.5rem 1fr;gap:.9rem;align-items:baseline;width:100%;
+  padding:.62rem .5rem;background:none;border:0;border-bottom:1px solid color-mix(in srgb,var(--gold) 12%,transparent);
+  cursor:pointer;text-align:left;font-family:var(--text);color:var(--body);font-size:.95rem;
+  transition:background .16s}
+.keyrow:hover,.keyrow.active{background:color-mix(in srgb,var(--gold) 8%,transparent);color:var(--ink)}
+.keyrow .ar{font-family:var(--display);font-size:1.15rem;direction:rtl;text-align:right}
+.keyrow .what{font-size:.86rem;color:var(--faint);display:block}
+
+/* ─── Feature leaves ───────────────────────────────────────────────────── */
+.feature{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.85fr);
+  gap:clamp(2rem,5vw,4rem);align-items:center}
+.feature.flip>.feature-shot{order:-1}
+.feature-shot{display:flex;justify-content:center}
+.spec{display:grid;gap:.1rem;margin-top:1.4rem;max-width:var(--measure)}
+.spec div{display:grid;grid-template-columns:8.5rem 1fr;gap:1rem;padding:.55rem 0;
+  border-top:1px solid color-mix(in srgb,var(--gold) 13%,transparent);font-size:.95rem}
+.spec dt{color:var(--gold-bright);font-family:var(--display);font-size:1.05rem}
+.spec dd{margin:0;color:var(--body)}
+
+/* The metals are a real sequence, so they are numbered like one. */
+.ladder{display:grid;gap:.1rem;margin-top:1.6rem;max-width:34rem}
+.rung{display:grid;grid-template-columns:2.2rem 1fr auto;gap:1rem;align-items:center;
+  padding:.7rem .2rem;border-top:1px solid color-mix(in srgb,var(--gold) 13%,transparent)}
+.rung b{font-family:var(--display);font-weight:400;font-size:1.12rem;color:var(--ink)}
+.rung .n{font-family:var(--display);color:var(--gold-dim);font-size:1.1rem}
+.rung .d{color:var(--faint);font-size:.92rem;font-variant-numeric:tabular-nums}
+
+.closing{text-align:center}
+.closing h2{margin-inline:auto}
+.closing p{margin-inline:auto}
+
+
+/* ─── Scrollytelling: the page assembles itself ──────────────────────────
+   The phone is pinned and the writing moves past it, so each paragraph is
+   read while the thing it describes is on screen. */
+.scrolly{padding-top:clamp(3rem,6vw,5rem);padding-bottom:0}
+.scrolly-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);
+  gap:clamp(2rem,5vw,4.5rem);align-items:start}
+.scrolly-intro{padding-bottom:clamp(2rem,6vh,4rem)}
+
+.step{max-width:46ch;padding:min(15vh,7rem) 0;opacity:.3;transition:opacity .45s ease}
+.step.is-live{opacity:1}
+.step h3{font-family:var(--display);font-weight:400;font-size:clamp(1.35rem,2.4vw,1.85rem);
+  color:var(--gold-bright);margin:0 0 .6rem}
+.step p{color:var(--body);margin:0}
+@media (prefers-reduced-motion:reduce){.step{opacity:1;transition:none}}
+
+.scrolly-stage{position:sticky;top:calc(4.2rem + 3vh);display:flex;flex-direction:column;
+  align-items:center;gap:1rem;padding-top:2rem}
+.stage-note{font-size:.9rem;color:var(--faint);margin:0;text-align:center;min-height:1.4em;
+  transition:opacity .3s ease}
+
+/* ─── The page inside the phone ──────────────────────────────────────────
+   Not a screenshot: the real text, the real colours, set as the app sets
+   them, so it can add a layer without swapping an image. */
+.mushaf{position:absolute;inset:0;background:#efe3c8;color:#2b2317;
+  display:flex;flex-direction:column;font-family:var(--display);overflow:hidden}
+.mushaf-head{flex:none;display:flex;align-items:center;justify-content:space-between;
+  gap:.5em;padding:calc(var(--w,270px)/6.6) .9em .5em;
+  background:linear-gradient(180deg,#3b2f1d,#2b2317);
+  color:#e8d6a8;font-size:.42rem}
+.mushaf-title{font-size:1.5em}
+.mushaf-back,.mushaf-juz{opacity:.75;font-size:1.2em}
+.mushaf-band{flex:none;font-size:.42rem;text-align:center;padding:.85em 0;
+  background:#e3cf9a;color:#4a3a17;border-block:1px solid #b08d3e;letter-spacing:.06em;
+  max-height:0;padding-block:0;border-width:0;overflow:hidden;
+  transition:max-height .4s ease,padding .4s ease,border-width .4s ease}
+.mushaf.has-band .mushaf-band{max-height:8em;padding-block:.85em;border-width:1px}
+.mushaf-body{flex:1;overflow:hidden;padding:.55rem .75rem}
+.mushaf-heading{margin:0 0 .6rem;padding:.5rem .4rem;text-align:center;border-radius:.3rem;
+  background:linear-gradient(180deg,#e8d6a2,#d9c079);border:1px solid #a8842f;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+.mushaf-heading span{font-size:.72rem;color:#3a2c0f;direction:rtl}
+.mushaf-bar{flex:none;height:2.6rem;background:linear-gradient(180deg,#3b2f1d,#241d12);
+  border-top:1px solid #b08d3e;display:flex;align-items:center;justify-content:space-evenly}
+.mushaf-bar span{width:.62rem;height:.62rem;border-radius:.16rem;background:#cbab63;opacity:.75}
+.mushaf-bar .mb-prev,.mushaf-bar .mb-next{width:.5rem;height:.5rem;transform:rotate(45deg);border-radius:.08rem}
+.mushaf-bar .mb-more{width:.75rem;height:.16rem;border-radius:999px}
+.mushaf-bar .mb-play{width:1.25rem;height:1.25rem;border-radius:50%;
+  background:radial-gradient(circle at 38% 32%,#f3dfae,#c49a3d);opacity:1}
+
+.mv{margin-bottom:.55rem;padding:.45rem .4rem;border-radius:.25rem;
+  border-bottom:1px solid rgba(176,141,62,.28);transition:background .35s ease}
+.mv:last-child{border-bottom:0}
+.mv-ar{direction:rtl;text-align:right;font-size:.92rem;line-height:2;color:#241d12}
+.mv-num{display:inline-block;color:#8a6c2c;font-size:.8em;margin-inline:.15em}
+.mv-tr{font-family:var(--text);font-size:.46rem;line-height:1.5;color:#5d4c2e;
+  margin:.3rem 0 0;max-height:0;opacity:0;overflow:hidden;
+  transition:max-height .4s ease,opacity .3s ease,margin .4s ease}
+.mushaf.has-translation .mv-tr{max-height:14em;opacity:1;margin-top:.3rem}
+
+/* Tajweed is off until the step that turns it on; the ink stays black until
+   then, exactly as the reader does it. */
+.mv mark{background:none;color:inherit;transition:color .45s ease}
+.mushaf.has-tajweed .mv mark{color:var(--rule)}
+
+/* Following the words: the spoken word holds, everything else steps back. */
+.mushaf.is-following .mv{background:transparent}
+.mushaf.is-following .mv.is-playing .mv-ar .w{opacity:.3;transition:opacity .4s ease}
+.mushaf.is-following .mv.is-playing .mv-ar .w.is-spoken{opacity:1}
+.mushaf.is-following .mv.is-playing{background:rgba(203,171,99,.22)}
+
+/* ─── The fan of metals ──────────────────────────────────────────────────
+   Overlapped like plates on a bench, because they are the same plate at
+   five stages of work rather than five different things. */
+.cover-head{max-width:58ch;margin-bottom:clamp(2rem,5vw,3.5rem)}
+.fan{display:flex;justify-content:center;align-items:flex-end;
+  padding:1rem 0 2rem;min-height:clamp(19rem,38vw,27rem)}
+.fan-card{appearance:none;background:none;border:0;padding:0;cursor:pointer;
+  position:relative;flex:none;
+  width:clamp(7.5rem,13vw,11rem);
+  margin-inline:clamp(-3.4rem,-5.5vw,-2rem);
+  transform:translateY(calc(var(--i) * -0.35rem)) rotate(calc((var(--i) - 2) * 5deg));
+  transform-origin:50% 100%;
+  transition:transform .5s cubic-bezier(.2,.8,.3,1),filter .4s ease,z-index 0s;
+  filter:brightness(.72) saturate(.85)}
+.fan-card:nth-child(1){z-index:1}.fan-card:nth-child(2){z-index:2}
+.fan-card:nth-child(3){z-index:3}.fan-card:nth-child(4){z-index:4}
+.fan-card:nth-child(5){z-index:5}
+.fan-card.is-active{filter:none;z-index:9;
+  transform:translateY(-2.4rem) rotate(calc((var(--i) - 2) * 2deg)) scale(1.09)}
+.fan-card:hover{filter:brightness(.92)}
+.fan-card.is-active:hover{filter:none}
+.fan-phone{display:block;border-radius:12%/6%;overflow:hidden;
+  background:linear-gradient(155deg,#4a4a52,#131316 30%,#0a0a0c 64%,#3a3a42);
+  padding:4%;box-shadow:0 1.4rem 3rem rgba(0,0,0,.6)}
+.fan-phone img{width:100%;display:block;border-radius:9%/4.5%}
+.fan-label{position:absolute;left:50%;bottom:-3.1rem;transform:translateX(-50%);
+  text-align:center;white-space:nowrap;opacity:0;transition:opacity .35s ease}
+.fan-card.is-active .fan-label{opacity:1}
+.fan-label b{display:block;font-family:var(--display);font-weight:400;font-size:1.15rem;
+  color:var(--gold-bright)}
+.fan-label i{font-style:normal;font-size:.82rem;color:var(--faint)}
+.cover-foot{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1.5rem,4vw,3rem);
+  margin-top:clamp(3rem,6vw,4.5rem)}
+.cover-foot b{color:var(--gold-bright);font-weight:400}
+@media (prefers-reduced-motion:reduce){.fan-card{transition:none}}
+
+@media (max-width:980px){
+  .scrolly-grid{grid-template-columns:minmax(0,1fr)}
+  .scrolly-stage{position:sticky;top:4.4rem;order:-1;padding-top:0;
+    background:linear-gradient(180deg,var(--ox-deep) 78%,transparent);padding-bottom:1rem;z-index:5}
+  .step{padding:8vh 0;opacity:1}
+  .fan-card{margin-inline:clamp(-2.6rem,-7vw,-1.4rem)}
+  .cover-foot{grid-template-columns:1fr}
+}
+
+/* One orchestrated arrival, on load, in the hero only. Everything further
+   down the page is already in place when you reach it. */
+.rise{opacity:0;transform:translateY(14px)}
+.loaded .rise{opacity:1;transform:none;transition:opacity .7s cubic-bezier(.2,.7,.3,1),transform .7s cubic-bezier(.2,.7,.3,1)}
+.loaded .rise:nth-child(1){transition-delay:.05s}
+.loaded .rise:nth-child(2){transition-delay:.13s}
+.loaded .rise:nth-child(3){transition-delay:.21s}
+.loaded .rise:nth-child(4){transition-delay:.29s}
+@media (prefers-reduced-motion:reduce){
+  .rise{opacity:1;transform:none;transition:none}
+}
+
+@media (max-width:980px){
+  .hero-grid,.tajweed-grid,.feature{grid-template-columns:minmax(0,1fr)}
+  .feature.flip>.feature-shot{order:0}
+  .leaf{grid-template-columns:minmax(0,1fr)}
+  .margin{display:none}
+  .masthead nav{display:none}
+  .stage{order:-1}
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="folio bar">
+    <a class="wordmark" href="#top"><img src="img/icon.png" alt=""><span>The Noble Quran</span></a>
+    <nav>
+      <a href="#reading">Reading</a>
+      <a href="#tajweed">Tajweed</a>
+      <a href="#cover">The cover</a>
+      <a href="#study">Study</a>
+    </nav>
+    <a class="btn btn-gold" href="#get">Get the app</a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ── Hero ──────────────────────────────────────────────────────────── -->
+<div class="hero">
+  <div class="folio hero-grid">
+    <div>
+      <h1 class="rise">The Quran, set the way a manuscript is set.</h1>
+      <p class="lede rise">Illuminated headings, verse medallions, and the rules of recitation
+        coloured into the letters. It opens on a book cover that keeps a record of every day
+        you read — and the cover changes as the record grows.</p>
+      <div class="hero-cta rise">
+        <a class="btn btn-gold" href="#get">Get the app</a>
+        <a class="btn btn-quiet" href="#reading">See how it reads</a>
+      </div>
+      <div class="scrub rise">
+        <div class="scrub-head">
+          <span class="scrub-metal" id="metalName">Iron</span>
+          <span class="scrub-step" id="stepName">Raw · day 1</span>
+        </div>
+        <input id="days" type="range" min="0" max="2675" value="1180" step="1"
+               aria-label="Days read, to see how the cover changes">
+        <p class="scrub-caption">Drag to walk the cover through five metals and seven worked
+          steps each — thirty-five stages in all.</p>
+      </div>
+    </div>
+
+    <div class="stage rise">
+      <div class="phone" style="--w:clamp(230px,30vw,310px)">
+        <div class="phone-island"></div>
+        <div class="phone-screen"><canvas id="coverCanvas" width="627" height="1302"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="rule folio">
+
+<!-- ── The page, assembled ────────────────────────────────────────────────
+     A pinned phone with a real page inside it. Each step adds one layer, so
+     what the writing describes is what the phone is doing beside it.      -->
+<section id="reading" class="scrolly">
+  <div class="folio scrolly-grid">
+
+    <div class="scrolly-steps">
+      <div class="scrolly-intro">
+        <h2>A surah opens in Arabic alone</h2>
+        <p class="lede">Everything else is a layer you add. Scroll, and the page beside this
+          builds itself the way you would build it.</p>
+      </div>
+
+      <article class="step" data-step="0">
+        <h3>The text, and nothing else</h3>
+        <p>Uthmani script, set in Amiri, with a medallion carrying the verse number in the
+          digits a mushaf prints. No translation, no notes, no chrome over the page.</p>
+      </article>
+
+      <article class="step" data-step="1">
+        <h3>Translation, when you want it</h3>
+        <p>Any edition the sources publish, chosen per reader and remembered. It sits under the
+          verse rather than beside it, so the Arabic keeps the full width of the column.</p>
+      </article>
+
+      <article class="step" data-step="2">
+        <h3>Tajweed, coloured into the letters</h3>
+        <p>Not a footnote about the rule — the rule, on the letter it applies to. Grey where a
+          letter is not sounded, blue for the prolongations, orange for nasal resonance, red for
+          the echo on a qalqalah.</p>
+      </article>
+
+      <article class="step" data-step="3">
+        <h3>The Quran's own divisions</h3>
+        <p>A band where each juz begins, quieter ones for the hizb and its quarters, shown at
+          whatever depth you choose — thirty marks, or ninety, or all two hundred and forty.</p>
+      </article>
+
+      <article class="step" data-step="4">
+        <h3>Follow the recitation, word by word</h3>
+        <p>With reciters who publish timings, the word being spoken stays at full strength and
+          the rest of the verse steps back. Nothing is boxed and no rule colour is displaced —
+          the colour is already saying which rule applies.</p>
+      </article>
+    </div>
+
+    <div class="scrolly-stage">
+      <div class="phone" style="--w:clamp(220px,26vw,290px)">
+        <div class="phone-island"></div>
+        <div class="phone-screen">
+          <div class="mushaf" id="mushaf">
+            <div class="mushaf-head">
+              <span class="mushaf-back">‹</span>
+              <span class="mushaf-title">103. Al-ʿAsr</span>
+              <span class="mushaf-juz">Juz 30</span>
+            </div>
+            <div class="mushaf-band" id="juzBand">Juz 30 · Quarter 4</div>
+            <div class="mushaf-body" id="mushafBody">
+              <div class="mushaf-heading"><span>سُورَةُ الْعَصْر</span></div>
+            </div>
+            <div class="mushaf-bar">
+              <span class="mb-layers"></span><span class="mb-prev"></span>
+              <span class="mb-play"></span><span class="mb-next"></span><span class="mb-more"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="stage-note" id="stageNote">Arabic alone</p>
+    </div>
+
+  </div>
+</section>
+
+<hr class="rule folio">
+
+<!-- ── Tajweed key ───────────────────────────────────────────────────────── -->
+<section id="tajweed">
+  <div class="folio leaf">
+    <div class="margin" aria-hidden="true">٢</div>
+    <div>
+      <h2>Seventeen rules, each with its own colour</h2>
+      <p class="lede">Colour alone names nothing, so the scheme is written down. Choose a rule
+        to see every place it falls in Al-ʿAsr.</p>
+
+      <div class="tajweed-grid" style="margin-top:2rem">
+        <div class="tajweed-verse" id="tv" dir="rtl" aria-label="Surah Al-Asr, coloured by rule"></div>
+        <div>
+          <div class="keylist" id="keylist"></div>
+          <p class="quiet" style="font-size:.92rem;margin-top:1.1rem">
+            The scheme is the one published with the tajweed text, moved in lightness only so it
+            reads on a dark ground. Hue is what carries the meaning, so hue never moves.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule folio">
+
+<!-- ── The cover, as a fan of metals ─────────────────────────────────────── -->
+<section id="cover">
+  <div class="folio">
+    <div class="cover-head">
+      <h2>Five metals, thirty-five stages</h2>
+      <p class="lede">The app opens on a book, not a menu, and the book is worked by reading.
+        Iron first. Platinum after three thousand days. Choose one to bring it forward.</p>
+    </div>
+
+    <div class="fan" id="fan">
+      <button class="fan-card" data-metal="iron" style="--i:0" aria-label="Iron">
+        <span class="fan-phone"><img src="img/cover_iron.webp" alt=""></span>
+        <span class="fan-label"><b>Iron</b><i>30 days</i></span>
+      </button>
+      <button class="fan-card" data-metal="bronze" style="--i:1" aria-label="Bronze">
+        <span class="fan-phone"><img src="img/cover_bronze.webp" alt=""></span>
+        <span class="fan-label"><b>Bronze</b><i>90 days</i></span>
+      </button>
+      <button class="fan-card" data-metal="silver" style="--i:2" aria-label="Silver">
+        <span class="fan-phone"><img src="img/cover_silver.webp" alt=""></span>
+        <span class="fan-label"><b>Silver</b><i>365 days</i></span>
+      </button>
+      <button class="fan-card is-active" data-metal="gold" style="--i:3" aria-label="Gold">
+        <span class="fan-phone"><img src="img/cover_gold.webp" alt=""></span>
+        <span class="fan-label"><b>Gold</b><i>1,095 days</i></span>
+      </button>
+      <button class="fan-card" data-metal="platinum" style="--i:4" aria-label="Platinum">
+        <span class="fan-phone"><img src="img/cover_platinum.webp" alt=""></span>
+        <span class="fan-label"><b>Platinum</b><i>1,095 days</i></span>
+      </button>
+    </div>
+
+    <div class="cover-foot">
+      <p class="quiet">Within each metal there are seven worked steps — raw, cleaned, filed,
+        burnished, polished, mirrored, radiant — and the plate brightens through all of them
+        before the next metal begins.</p>
+      <p class="quiet">A day you read is worth <b>+1</b>. A day you miss costs <b>−2</b>, and it
+        never falls below nothing. The metal, the step and the brightness within the step are
+        all read off that single running total, which is why the cover can fall back as well as
+        climb.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Study ─────────────────────────────────────────────────────────── -->
+<section id="study">
+  <div class="folio feature flip">
+    <div>
+      <h2>Built to study from, not only to read</h2>
+      <p class="lede">Follow a recitation word by word. Test what you have memorised. Trace a
+        word back to its root and find everywhere else it occurs.</p>
+      <dl class="spec">
+        <div><dt>Word-following</dt><dd>With reciters who publish timings, the word being spoken is lit and the rest of the verse steps back</dd></div>
+        <div><dt>Memorisation</dt><dd>Repeat a range, a block or a single verse; a review ladder tracks what is holding and what is slipping</dd></div>
+        <div><dt>Roots</dt><dd>Tap a word for its root, its meaning, and every occurrence in the Quran</dd></div>
+        <div><dt>Makharij</dt><dd>An articulation trainer with a cross-section of the mouth and a reference recording for all 28 letters</dd></div>
+        <div><dt>Divisions</dt><dd>Juz, hizb and all 240 quarters, marked at whatever depth you choose</dd></div>
+      </dl>
+    </div>
+    <div class="feature-shot">
+      <div class="phone" style="--w:clamp(210px,24vw,260px)">
+        <div class="phone-island"></div>
+        <div class="phone-screen"><img src="img/shot_reader.webp" alt="The reader, showing a surah"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule folio">
+
+<!-- ── Close ─────────────────────────────────────────────────────────── -->
+<section id="get">
+  <div class="folio closing">
+    <h2>Free, with no account and no advertising</h2>
+    <p class="lede" style="max-width:54ch">Analytics record which screens are used and for how
+      long, so that what gets built next is what people actually reach for, and what gets fixed
+      first is what is actually in the way. No identifier, no profile, nothing that could say
+      who was reading what.</p>
+    <div style="display:flex;gap:.9rem;justify-content:center;flex-wrap:wrap;margin-top:1.6rem">
+      <a class="btn btn-gold" href="#">Download on the App Store</a>
+      <a class="btn btn-quiet" href="privacy.html">Read the privacy policy</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<hr class="rule folio">
+<footer>
+  <div class="folio foot">
+    <div>© 2026 fbugri</div>
+    <nav>
+      <a href="privacy.html">Privacy</a>
+      <a href="support.html">Support</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+(function(){
+'use strict';
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ── The layers, as the reader has them ─────────────────────────────── */
+document.querySelectorAll('.sw').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    const on = btn.getAttribute('aria-pressed') === 'true';
+    btn.setAttribute('aria-pressed', String(!on));
+    document.getElementById(btn.dataset.line).hidden = on;
+  });
+});
+
+/* ── Tajweed ─────────────────────────────────────────────────────────────
+   The markup and the colours are the app's own. Text comes from AlQuran
+   Cloud's quran-tajweed edition, where a rule is written [code[letters].  */
+const RULES = {
+  h:['Hamzat ul Wasl','همزة الوصل','#AAAAAA','Written, but not sounded when joined to what precedes it'],
+  s:['Silent','حرف ساكن','#AAAAAA','A letter written but not pronounced'],
+  l:['Laam Shamsiyyah','لام شمسية','#AAAAAA','The laam of "al-" absorbed into a sun letter'],
+  n:['Madd Normal','مد عادي','#537FFF','Held for two counts'],
+  p:['Madd Permissible','مد جائز','#4050FF','May be held for two, four or six'],
+  o:['Madd Obligatory','مد واجب','#2144C1','Held for four or five counts'],
+  m:['Madd Necessary','مد لازم','#000EBC','Held for six counts'],
+  g:['Ghunnah','غنة','#FF7E1E','Nasal resonance, held for two counts'],
+  q:['Qalqalah','قلقلة','#DD0008','An echo on the letter when it carries no vowel'],
+  f:['Ikhfa','إخفاء','#9400A8','Nun sakin or tanwin hidden before certain letters'],
+  c:['Ikhfa Shafawi','إخفاء شفوي','#D500B7','Meem sakin hidden before ba'],
+  w:['Idgham Shafawi','إدغام شفوي','#58B800','Meem merged into meem'],
+  i:['Iqlab','إقلاب','#26BFFD','Nun or tanwin turned into a meem before ba'],
+  a:['Idgham With Ghunnah','إدغام بغنة','#169777','Merged, carrying nasal resonance'],
+  u:['Idgham Without Ghunnah','إدغام بلا غنة','#169200','Merged, without resonance']
+};
+const VERSES = [
+  'وَ[h:9999[ٱ]لْعَصْرِ',
+  'إِ[g[نّ]َ [h:7137[ٱ]لْإِ[f:5969[نس]َ[n[ـٰ]نَ لَفِى خُسْرٍ',
+  'إِلَّا [h:778[ٱ]لَّذِينَ ءَامَنُو[s[اْ] وَعَمِلُو[s[اْ] [h:118[ٱ][l[ل]صَّ[n[ـٰ]لِحَ[n[ـٰ]تِ وَتَوَاصَوْ[s[اْ] بِ[h:370[ٱ]لْحَقِّ وَتَوَاصَوْ[s[اْ] بِ[h:223[ٱ][l[ل]صَّ[q:223[بْ]رِ'
+];
+
+/* Lightness is nudged so each hue reads on a dark ground; hue itself is left
+   exactly where the published scheme puts it. */
+function onDark(hex){
+  const n = parseInt(hex.slice(1),16);
+  let r=(n>>16)/255, g=((n>>8)&255)/255, b=(n&255)/255;
+  const mx=Math.max(r,g,b), mn=Math.min(r,g,b), l=(mx+mn)/2;
+  if(l>=0.62) return hex;
+  const k=(0.62-l)/(1-l);
+  const up=v=>Math.round((v+(1-v)*k)*255);
+  return '#'+[up(r),up(g),up(b)].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+
+const tv = document.getElementById('tv');
+const keylist = document.getElementById('keylist');
+const seen = [];
+
+VERSES.forEach(function(src, i){
+  const line = document.createElement('span');
+  line.className = 'v';
+  const re = /\[([a-z])(?::\d+)?\[([^\]]*)\]/g;
+  let last = 0, m;
+  while((m = re.exec(src)) !== null){
+    if(m.index > last) line.appendChild(plain(src.slice(last, m.index)));
+    const code = m[1], rule = RULES[code];
+    if(rule){
+      const el = document.createElement('mark');
+      el.textContent = m[2];
+      el.style.color = onDark(rule[2]);
+      el.dataset.code = code;
+      line.appendChild(el);
+      if(seen.indexOf(code) === -1) seen.push(code);
+    } else {
+      line.appendChild(plain(m[2]));
+    }
+    last = re.lastIndex;
+  }
+  if(last < src.length) line.appendChild(plain(src.slice(last)));
+  const num = document.createElement('span');
+  num.className = 'plain';
+  num.style.color = 'var(--gold-dim)';
+  num.textContent = ' ۝' + String(i+1).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[+d]) + ' ';
+  line.appendChild(num);
+  tv.appendChild(line);
+});
+
+function plain(t){
+  const s = document.createElement('span');
+  s.className = 'plain';
+  s.textContent = t;
+  return s;
+}
+
+seen.forEach(function(code){
+  const r = RULES[code];
+  const row = document.createElement('button');
+  row.type = 'button';
+  row.className = 'keyrow';
+  row.dataset.code = code;
+  row.innerHTML = '<span class="ar" style="color:' + onDark(r[2]) + '">' + r[1] + '</span>' +
+                  '<span>' + r[0] + '<span class="what">' + r[3] + '</span></span>';
+  keylist.appendChild(row);
+});
+
+let activeRule = null;
+function showRule(code){
+  activeRule = code;
+  tv.classList.toggle('dimmed', code !== null);
+  tv.querySelectorAll('mark').forEach(function(el){
+    el.classList.toggle('lit', el.dataset.code === code);
+  });
+  keylist.querySelectorAll('.keyrow').forEach(function(el){
+    el.classList.toggle('active', el.dataset.code === code);
+  });
+}
+keylist.addEventListener('click', function(e){
+  const row = e.target.closest('.keyrow');
+  if(!row) return;
+  showRule(activeRule === row.dataset.code ? null : row.dataset.code);
+});
+keylist.addEventListener('mouseover', function(e){
+  const row = e.target.closest('.keyrow');
+  if(row && activeRule === null) showRule(row.dataset.code);
+});
+keylist.addEventListener('mouseleave', function(){ if(activeRule === null) showRule(null); });
+
+/* ── The living cover ────────────────────────────────────────────────────
+   The same artwork the app draws, lit the same way: a slow breath, a gleam
+   that crosses, and glints that fire where the metal actually catches. The
+   metal is a tint over the plate, which is why dragging the scrubber walks
+   it from iron to platinum.                                              */
+const METALS = [
+  {name:'Iron',     days:30,   tint:[108,112,120], gleam:.42},
+  {name:'Bronze',   days:90,   tint:[158,104,52],  gleam:.60},
+  {name:'Silver',   days:365,  tint:[206,210,218], gleam:.80},
+  {name:'Gold',     days:1095, tint:[214,170,74],  gleam:.95},
+  {name:'Platinum', days:1095, tint:[236,240,246], gleam:1.10}
+];
+const STEPS = ['Raw','Cleaned','Filed','Burnished','Polished','Mirrored','Radiant'];
+
+const canvas = document.getElementById('coverCanvas');
+const ctx = canvas.getContext('2d');
+const plate = new Image();
+let ready = false;
+plate.onload = function(){ ready = true; draw(performance.now()); };
+plate.src = 'img/shot_cover.webp';
+
+const daysInput = document.getElementById('days');
+const metalName = document.getElementById('metalName');
+const stepName  = document.getElementById('stepName');
+
+function stateFor(days){
+  let d = days;
+  for(let i=0;i<METALS.length;i++){
+    if(d < METALS[i].days || i === METALS.length-1){
+      const frac = Math.min(0.999, d / METALS[i].days);
+      return {metal:METALS[i], step:Math.floor(frac*7), frac:frac, days:days};
+    }
+    d -= METALS[i].days;
+  }
+}
+
+let current = stateFor(0);
+function readScrub(){
+  current = stateFor(+daysInput.value);
+  metalName.textContent = current.metal.name;
+  stepName.textContent = STEPS[current.step] + ' · day ' + (+daysInput.value + 1).toLocaleString();
+  daysInput.style.setProperty('--pct', (daysInput.value / daysInput.max * 100) + '%');
+}
+daysInput.addEventListener('input', function(){ readScrub(); if(reduced) draw(performance.now()); });
+readScrub();
+
+/* Glints are placed where the plate is genuinely bright, sampled once. */
+let glints = [];
+function sampleGlints(){
+  const off = document.createElement('canvas');
+  off.width = 96; off.height = 200;
+  const octx = off.getContext('2d', {willReadFrequently:true});
+  octx.drawImage(plate, 0, 0, off.width, off.height);
+  const data = octx.getImageData(0,0,off.width,off.height).data;
+  for(let y=0;y<off.height;y+=2){
+    for(let x=0;x<off.width;x+=2){
+      const i=(y*off.width+x)*4;
+      const lum=(data[i]*0.2126+data[i+1]*0.7152+data[i+2]*0.0722)/255;
+      if(lum>0.74 && Math.random()<0.16){
+        glints.push({x:x/off.width, y:y/off.height, phase:Math.random()*Math.PI*2, lum:lum});
+      }
+    }
+  }
+  glints = glints.slice(0,240);
+}
+
+function draw(t){
+  if(!ready) return;
+  const w = canvas.width, h = canvas.height;
+  if(!glints.length){ try{ sampleGlints(); }catch(e){ glints=[]; } }
+
+  ctx.clearRect(0,0,w,h);
+  ctx.drawImage(plate,0,0,w,h);
+
+  const m = current.metal;
+  const worked = 0.35 + 0.65*(current.step/6);
+
+  // The metal itself, laid over the plate.
+  ctx.globalCompositeOperation = 'color';
+  ctx.fillStyle = 'rgb('+m.tint[0]+','+m.tint[1]+','+m.tint[2]+')';
+  ctx.globalAlpha = 0.82;
+  ctx.fillRect(0,0,w,h);
+
+  // Worked steps read as depth of polish, not as a different colour.
+  ctx.globalCompositeOperation = 'overlay';
+  ctx.globalAlpha = 0.18 + 0.42*worked;
+  ctx.fillStyle = 'rgb('+m.tint[0]+','+m.tint[1]+','+m.tint[2]+')';
+  ctx.fillRect(0,0,w,h);
+
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.globalAlpha = 1;
+
+  if(!reduced){
+    // One slow breath out from the medallion, and a fainter gleam crossing.
+    const breath = 0.5 + 0.5*Math.sin(t/4600*Math.PI);
+    const g = ctx.createRadialGradient(w*0.5,h*0.5,w*0.05,w*0.5,h*0.5,w*1.05);
+    g.addColorStop(0,'rgba(255,244,214,'+(0.05+0.07*breath*m.gleam*worked)+')');
+    g.addColorStop(1,'rgba(255,244,214,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,w,h);
+
+    const sweep = ((t/19000) % 1) * 2.2 - 0.6;
+    const lg = ctx.createLinearGradient(0,(sweep-0.22)*h,0,(sweep+0.22)*h);
+    lg.addColorStop(0,'rgba(255,246,222,0)');
+    lg.addColorStop(0.5,'rgba(255,246,222,'+(0.055*m.gleam*worked)+')');
+    lg.addColorStop(1,'rgba(255,246,222,0)');
+    ctx.fillStyle = lg;
+    ctx.fillRect(0,0,w,h);
+
+    // Glints catch as the light reaches them.
+    ctx.globalCompositeOperation = 'lighter';
+    for(let i=0;i<glints.length;i++){
+      const p = glints[i];
+      const near = 1 - Math.min(1, Math.abs(p.y - sweep)*4.2);
+      if(near <= 0) continue;
+      const a = near * (0.35+0.65*Math.sin(t/1400 + p.phase)**2) * 0.5 * m.gleam * worked;
+      if(a <= 0.004) continue;
+      const r = w*0.012*(0.6+p.lum);
+      const rg = ctx.createRadialGradient(p.x*w,p.y*h,0,p.x*w,p.y*h,r);
+      rg.addColorStop(0,'rgba(255,250,232,'+a+')');
+      rg.addColorStop(1,'rgba(255,250,232,0)');
+      ctx.fillStyle = rg;
+      ctx.fillRect(p.x*w-r,p.y*h-r,r*2,r*2);
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  }
+}
+
+let raf = null;
+function loop(t){ draw(t); raf = requestAnimationFrame(loop); }
+if(!reduced){
+  // Only while it is on screen — no point lighting a cover nobody is looking at.
+  const io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting && raf === null) raf = requestAnimationFrame(loop);
+      else if(!e.isIntersecting && raf !== null){ cancelAnimationFrame(raf); raf = null; }
+    });
+  }, {threshold:0.05});
+  io.observe(canvas);
+}
+
+
+/* ── The page inside the phone ───────────────────────────────────────────
+   Built once from the same markup the tajweed key uses, then layers are
+   added by class. Words are kept as their own spans so the recitation can
+   light one without disturbing the rule colours inside it.              */
+const TRANSLATION = [
+  'By time,',
+  'Indeed, mankind is in loss,',
+  'Except for those who have believed and done righteous deeds and advised each other to truth and advised each other to patience.'
+];
+
+function buildWord(src){
+  const w = document.createElement('span');
+  w.className = 'w';
+  const re = /\[([a-z])(?::\d+)?\[([^\]]*)\]/g;
+  let last = 0, m;
+  while((m = re.exec(src)) !== null){
+    if(m.index > last) w.appendChild(document.createTextNode(src.slice(last, m.index)));
+    const rule = RULES[m[1]];
+    if(rule){
+      const el = document.createElement('mark');
+      el.textContent = m[2];
+      el.style.setProperty('--rule', onDark(rule[2]));
+      w.appendChild(el);
+    } else {
+      w.appendChild(document.createTextNode(m[2]));
+    }
+    last = re.lastIndex;
+  }
+  if(last < src.length) w.appendChild(document.createTextNode(src.slice(last)));
+  return w;
+}
+
+const mushaf = document.getElementById('mushaf');
+const mushafBody = document.getElementById('mushafBody');
+if(mushafBody){
+  VERSES.forEach(function(src, i){
+    const v = document.createElement('div');
+    v.className = 'mv';
+    const ar = document.createElement('div');
+    ar.className = 'mv-ar';
+    src.split(' ').forEach(function(word, wi){
+      if(wi) ar.appendChild(document.createTextNode(' '));
+      ar.appendChild(buildWord(word));
+    });
+    const num = document.createElement('span');
+    num.className = 'mv-num';
+    num.textContent = '۝' + String(i+1).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[+d]);
+    ar.appendChild(num);
+    v.appendChild(ar);
+    const tr = document.createElement('p');
+    tr.className = 'mv-tr';
+    tr.textContent = TRANSLATION[i];
+    v.appendChild(tr);
+    mushafBody.appendChild(v);
+  });
+}
+
+/* Each step turns on exactly one more thing. */
+const STEP_STATE = [
+  {cls:[],                                                    note:'Arabic alone'},
+  {cls:['has-translation'],                                   note:'Translation added'},
+  {cls:['has-translation','has-tajweed'],                     note:'Tajweed coloured in'},
+  {cls:['has-translation','has-tajweed','has-band'],          note:'Juz and quarter marked'},
+  {cls:['has-translation','has-tajweed','has-band','is-following'], note:'Following the recitation'}
+];
+const stageNote = document.getElementById('stageNote');
+const steps = Array.prototype.slice.call(document.querySelectorAll('.step'));
+
+function applyStep(n){
+  if(!mushaf) return;
+  const state = STEP_STATE[n] || STEP_STATE[0];
+  ['has-translation','has-tajweed','has-band','is-following'].forEach(function(c){
+    mushaf.classList.toggle(c, state.cls.indexOf(c) !== -1);
+  });
+  if(stageNote) stageNote.textContent = state.note;
+  steps.forEach(function(el, i){ el.classList.toggle('is-live', i === n); });
+
+  // On the last step, walk a word along verse three so the idea is visible
+  // rather than merely described.
+  clearInterval(walk);
+  mushafBody.querySelectorAll('.is-spoken,.is-playing').forEach(function(el){
+    el.classList.remove('is-spoken'); el.classList.remove('is-playing');
+  });
+  if(n === 4 && !reduced){
+    const verses = mushafBody.querySelectorAll('.mv');
+    const verse = verses[verses.length - 1];
+    if(!verse) return;
+    verse.classList.add('is-playing');
+    const words = verse.querySelectorAll('.mv-ar .w');
+    let k = 0;
+    const tick = function(){
+      words.forEach(function(w){ w.classList.remove('is-spoken'); });
+      words[k % words.length].classList.add('is-spoken');
+      k++;
+    };
+    tick();
+    walk = setInterval(tick, 620);
+  }
+}
+let walk = null;
+
+/* ?step=N pins one step and leaves the observer off, so a single state can be
+   opened, linked to, or screenshotted without scrolling to find it. */
+const pinned = new URLSearchParams(location.search).get('step');
+
+if(steps.length && pinned !== null){
+  applyStep(Math.max(0, Math.min(STEP_STATE.length - 1, +pinned)));
+} else if(steps.length){
+  let currentStep = -1;
+  const stepObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(!e.isIntersecting) return;
+      const n = +e.target.dataset.step;
+      if(n !== currentStep){ currentStep = n; applyStep(n); }
+    });
+  }, {rootMargin:'-45% 0px -45% 0px', threshold:0});
+  steps.forEach(function(el){ stepObserver.observe(el); });
+  applyStep(0);
+}
+
+/* ── The fan of metals ───────────────────────────────────────────────── */
+const fan = document.getElementById('fan');
+if(fan){
+  fan.addEventListener('click', function(e){
+    const card = e.target.closest('.fan-card');
+    if(!card) return;
+    fan.querySelectorAll('.fan-card').forEach(function(c){
+      c.classList.toggle('is-active', c === card);
+    });
+  });
+  fan.addEventListener('mouseover', function(e){
+    const card = e.target.closest('.fan-card');
+    if(!card) return;
+    fan.querySelectorAll('.fan-card').forEach(function(c){
+      c.classList.toggle('is-active', c === card);
+    });
+  });
+}
+
+requestAnimationFrame(function(){ document.body.classList.add('loaded'); });
+})();
+</script>
+</body>
+</html>

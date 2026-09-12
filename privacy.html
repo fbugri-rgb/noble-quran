@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy — The Noble Quran</title>
+<meta name="description" content="What The Noble Quran records, what it does not, and where the data goes.">
+<link rel="icon" href="img/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Alegreya+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  .prose{max-width:68ch;margin-inline:auto}
+  .prose h2{margin-top:2.8rem}
+  .prose h2:first-of-type{margin-top:1.5rem}
+  .prose ul{padding-left:1.1rem;color:var(--body);max-width:var(--measure)}
+  .prose li{margin-bottom:.5rem}
+  .prose code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em;
+    color:var(--gold-bright);background:color-mix(in srgb,var(--gold) 9%,transparent);
+    padding:.1em .35em;border-radius:.25rem}
+  .stamp{color:var(--faint);font-size:.92rem;margin-bottom:2.5rem}
+  table{border-collapse:collapse;width:100%;max-width:var(--measure);margin:1.2rem 0 1.6rem;font-size:.98rem}
+  th,td{text-align:left;padding:.65rem .8rem .65rem 0;
+    border-bottom:1px solid color-mix(in srgb,var(--gold) 14%,transparent);vertical-align:top}
+  th{font-family:var(--display);font-weight:400;color:var(--gold-bright);font-size:1.05rem}
+  td{color:var(--body)}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="folio bar">
+    <a class="wordmark" href="index.html"><img src="img/icon.png" alt=""><span>The Noble Quran</span></a>
+    <nav>
+      <a href="index.html#reading">Reading</a>
+      <a href="index.html#tajweed">Tajweed</a>
+      <a href="index.html#cover">The cover</a>
+    </nav>
+    <a class="btn btn-quiet" href="support.html">Support</a>
+  </div>
+</header>
+
+<main>
+<section>
+  <div class="folio prose">
+    <h1 style="font-size:clamp(2.2rem,4.5vw,3.4rem);margin-bottom:.6rem">Privacy</h1>
+    <p class="stamp">Last updated 12 September 2026</p>
+
+    <p class="lede">The app records which screens are used and for how long, so it can be made
+      better at the things people actually do with it. It does not record who is using them, and
+      there is no identifier that could be traced back to you.</p>
+
+    <h2>Why anything is collected</h2>
+    <p>The app is built by one person, and usage data is the only honest way to tell which parts
+      of it earn their place. Knowing that a feature is opened by nearly everyone — or by almost
+      nobody — is what decides which of them gets improved next, which gets fixed first, and
+      which is quietly taking up room. Knowing how long a screen holds someone says whether it
+      is doing its job or getting in the way.</p>
+    <p>Improving the app is the whole purpose. The data is never sold, never shared with anyone,
+      and never used for advertising. None of it needs to know who you are, which is exactly why
+      it doesn't.</p>
+
+    <h2>What is collected</h2>
+    <p>Usage data only, through <a href="https://aptabase.com" style="color:var(--gold-bright)">Aptabase</a>,
+      an analytics service that is open source and privacy-focused by design. Each event carries:</p>
+    <table>
+      <tr><th>Event</th><td>Which of three things happened: the app was opened, a screen was left, or a feature was used</td></tr>
+      <tr><th>Settings</th><td>Your chosen appearance, translation, reciter, tafsir, fonts and toggles — the shape of your setup, not its contents</td></tr>
+      <tr><th>Duration</th><td>How long a screen was open, in whole minutes</td></tr>
+      <tr><th>Device</th><td>Operating system and version, app version, and country</td></tr>
+    </table>
+
+    <h2>What is not collected</h2>
+    <ul>
+      <li><strong>No device identifier and no advertising identifier.</strong> Aptabase does not
+        issue one, so there is nothing to link two sessions together as the same person.</li>
+      <li><strong>No account.</strong> The app has no sign-in, so there is no name, email or profile.</li>
+      <li><strong>No reading position.</strong> Which surah or verse you are on, what you have
+        bookmarked, what you have memorised and what you have written in your notes never leave
+        your device.</li>
+      <li><strong>No precise location.</strong> Country is derived from the network request and
+        nothing finer is recorded.</li>
+      <li><strong>No tracking across apps or websites.</strong> There is no advertising and no
+        third-party tracker.</li>
+    </ul>
+
+    <h2>Where your own work is kept</h2>
+    <p>Bookmarks, notes, topics, memorised surahs, reading sessions, saved roots, cached verses
+      and downloaded recitations are stored in a database on your device. They are included in
+      your device's own iCloud or local backup if you have one, and are never uploaded anywhere
+      by the app. Deleting the app deletes them.</p>
+
+    <h2>What the app fetches</h2>
+    <p>Quran text, translations, tafsir and recitation are requested as you read them, from
+      <a href="https://alquran.cloud" style="color:var(--gold-bright)">AlQuran Cloud</a> and
+      <a href="https://quran.com" style="color:var(--gold-bright)">Quran.com</a>. Those requests
+      carry no identifier from the app, though like any web request they reach the provider with
+      your IP address, which is subject to each provider's own policy.</p>
+
+    <h2>Children</h2>
+    <p>The app is suitable for all ages and collects nothing that could identify anyone, of any age.</p>
+
+    <h2>Changes</h2>
+    <p>If what the app collects ever changes, this page changes with it and the date above is
+      updated.</p>
+
+    <h2>Getting in touch</h2>
+    <p>Questions about any of this go to <a href="support.html" style="color:var(--gold-bright)">support</a>.</p>
+  </div>
+</section>
+</main>
+
+<hr class="rule folio">
+<footer>
+  <div class="folio foot">
+    <div>© 2026 fbugri</div>
+    <nav>
+      <a href="privacy.html">Privacy</a>
+      <a href="support.html">Support</a>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>

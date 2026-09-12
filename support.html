@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support — The Noble Quran</title>
+<meta name="description" content="Help with The Noble Quran: common questions, and how to report a problem.">
+<link rel="icon" href="img/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Alegreya+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  .prose{max-width:68ch;margin-inline:auto}
+  .ask{border-top:1px solid color-mix(in srgb,var(--gold) 16%,transparent);padding:1.4rem 0}
+  .ask h3{font-family:var(--display);font-weight:400;font-size:1.35rem;color:var(--gold-bright);
+    margin:0 0 .5rem}
+  .ask p{margin:0;color:var(--body)}
+  .ask p + p{margin-top:.6rem}
+  .contact{background:linear-gradient(180deg,var(--ox-lift),var(--ox));
+    border:1px solid color-mix(in srgb,var(--gold) 24%,transparent);border-radius:1rem;
+    padding:clamp(1.5rem,3vw,2.2rem);margin-top:2.5rem}
+  .contact h2{margin-bottom:.5rem}
+  .contact p{max-width:52ch}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="folio bar">
+    <a class="wordmark" href="index.html"><img src="img/icon.png" alt=""><span>The Noble Quran</span></a>
+    <nav>
+      <a href="index.html#reading">Reading</a>
+      <a href="index.html#tajweed">Tajweed</a>
+      <a href="index.html#cover">The cover</a>
+    </nav>
+    <a class="btn btn-quiet" href="privacy.html">Privacy</a>
+  </div>
+</header>
+
+<main>
+<section>
+  <div class="folio prose">
+    <h1 style="font-size:clamp(2.2rem,4.5vw,3.4rem);margin-bottom:.6rem">Support</h1>
+    <p class="lede" style="margin-bottom:2.5rem">Answers to what comes up most, and a way to
+      reach someone if none of them fit.</p>
+
+    <div class="ask">
+      <h3>The recitation stops when I lock the screen</h3>
+      <p>It shouldn't — playback continues with the screen locked, and the lock screen and
+        Control Centre both carry the controls. If it stops, check that the app is allowed to
+        play in the background and that Low Power Mode is off, since iOS suspends more
+        aggressively under it.</p>
+    </div>
+
+    <div class="ask">
+      <h3>Following the words is not offered for my reciter</h3>
+      <p>Word-level timings are published for some reciters and not others, and the app only
+        offers the feature where real timings exist rather than guessing at them. Choosing a
+        different reciter in Settings will bring it back.</p>
+    </div>
+
+    <div class="ask">
+      <h3>A surah will not load</h3>
+      <p>Verses are fetched the first time you open a surah and cached afterwards, so a surah
+        you have read before works offline but a new one needs a connection. If it persists with
+        a good connection, the source API may be briefly down; it will load on a later attempt.</p>
+    </div>
+
+    <div class="ask">
+      <h3>My reading streak reset</h3>
+      <p>A day you read counts +1 and a day you miss counts −2, so a gap of a few days pulls the
+        total down faster than it climbed. It never drops below zero, and reading again starts
+        it climbing from wherever it landed.</p>
+    </div>
+
+    <div class="ask">
+      <h3>Can I move my notes and bookmarks to a new phone?</h3>
+      <p>Yes. Settings has a backup that writes a single file containing your own work — notes,
+        bookmarks, topics, memorised surahs and reading history — which you can restore on the
+        other device. It deliberately leaves out cached verses and downloaded audio, which the
+        new device will fetch for itself.</p>
+    </div>
+
+    <div class="ask">
+      <h3>Is my reading private?</h3>
+      <p>Yes. What you read, bookmark, note and memorise stays on your device. The app reports
+        which screens are used and for how long, with no identifier attached to it — the
+        <a href="privacy.html" style="color:var(--gold-bright)">privacy page</a> sets out
+        exactly what is and is not recorded.</p>
+    </div>
+
+    <div class="contact">
+      <h2>Still stuck?</h2>
+      <p>Report a problem or ask for something on
+        <a href="https://github.com/fbugri-rgb/noble-quran/issues" style="color:var(--gold-bright)">the issue tracker</a>.
+        Saying which iPhone and which iOS version you are on, and what you did just before it
+        went wrong, makes it far quicker to fix.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<hr class="rule folio">
+<footer>
+  <div class="folio foot">
+    <div>© 2026 fbugri</div>
+    <nav>
+      <a href="privacy.html">Privacy</a>
+      <a href="support.html">Support</a>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
