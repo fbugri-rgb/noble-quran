@@ -68,6 +68,14 @@ chrome --headless --window-size=1200,630 --force-device-scale-factor=2 \
 
 Edit the copy in `og.html` and re-render; do not retouch the JPEG.
 
+## The Arabic in the Makharij section
+
+Each Arabic letter set inline with English is wrapped in `<bdi>`. Without it
+the bidirectional algorithm reorders them across the Latin words and the
+sentence comes out saying the wrong thing — "ص is not س, ح is not ه" rendered
+as "ص is not ح, س is not ق". It looks like a typo and is not one. Any new
+sentence mixing single Arabic letters into English needs the same treatment.
+
 ## Images
 
 `img/cover_*.webp` are one cover screenshot tinted per metal by luminance, so
