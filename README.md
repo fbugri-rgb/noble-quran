@@ -78,10 +78,14 @@ sentence mixing single Arabic letters into English needs the same treatment.
 
 ## Images
 
-`img/cover_*.webp` are one cover screenshot tinted per metal by luminance, so
-the relief of the artwork survives rather than flattening into coloured shapes.
-Regenerate all five together if that screenshot is ever recaptured — the fan
-shows them side by side and a mismatched one would stand out.
+`img/cover_*.webp` are **real captures of the app**, one per metal, taken by
+the screenshot driver in the app repo with the reading days seeded to the last
+step of each metal. They were previously Python tints of a single screenshot;
+they are not any more, so they show the backlight behind the medallion and the
+Name lighting at platinum exactly as the app draws them.
+
+Regenerate all five together, never one at a time — the fan shows them side by
+side and a mismatched one would stand out.
 
 `img/shot_reader.webp` is a **recolour, not a fresh capture**: the run was in a
 blue appearance, and its luminance was mapped onto the app's Parchment ramp.
