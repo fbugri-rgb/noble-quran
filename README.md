@@ -53,6 +53,21 @@ observer off:
 ?step=4   + following the recitation
 ```
 
+## The link preview
+
+`img/og.jpg` is what appears when the site is shared. It is rendered from
+`og.html` rather than drawn in a script, so it uses the site's own typefaces and
+palette instead of an approximation:
+
+```sh
+python3 -m http.server 8000
+chrome --headless --window-size=1200,630 --force-device-scale-factor=2 \
+       --screenshot=og_raw.png http://localhost:8000/og.html
+# then downscale og_raw.png to 1200×630 and save as img/og.jpg
+```
+
+Edit the copy in `og.html` and re-render; do not retouch the JPEG.
+
 ## Images
 
 `img/cover_*.webp` are one cover screenshot tinted per metal by luminance, so
