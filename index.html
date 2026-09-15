@@ -732,12 +732,19 @@ keylist.addEventListener('mouseleave', function(){ if(activeRule === null) showR
    lasts, which is simply the distance to the next one. The ladder ends at
    2190, where the app's lastCoverDay puts it. */
 const LAST_DAY = 2190;
+/* `shot` is the day each render was photographed, which is what the scrubber
+   walks between. The plate used to be one gold image tinted per metal, and a
+   tint cannot put light into the Name: at platinum the app lifts the
+   calligraphy until it is the thing giving off the light, and a pale wash
+   over a dark stroke just gives a pale plate with a grey mark on it. These
+   are the app's own renders, so whatever the cover does at that day is in
+   the picture already. */
 const METALS = [
-  {name:'Iron',     start:0,    tint:[108,112,120], gleam:.42},
-  {name:'Bronze',   start:30,   tint:[158,104,52],  gleam:.60},
-  {name:'Silver',   start:90,   tint:[206,210,218], gleam:.80},
-  {name:'Gold',     start:365,  tint:[214,170,74],  gleam:.95},
-  {name:'Platinum', start:1095, tint:[236,240,246], gleam:1.10}
+  {name:'Iron',     start:0,    shot:15,   src:'img/cover_iron.webp',     gleam:.42},
+  {name:'Bronze',   start:30,   shot:60,   src:'img/cover_bronze.webp',   gleam:.60},
+  {name:'Silver',   start:90,   shot:227,  src:'img/cover_silver.webp',   gleam:.80},
+  {name:'Gold',     start:365,  shot:730,  src:'img/cover_gold.webp',     gleam:.95},
+  {name:'Platinum', start:1095, shot:1950, src:'img/cover_platinum.webp', gleam:1.10}
 ];
 METALS.forEach(function(m,i){
   m.days = (i === METALS.length - 1 ? LAST_DAY : METALS[i+1].start) - m.start;
@@ -746,10 +753,37 @@ const STEPS = ['Raw','Cleaned','Filed','Burnished','Polished','Mirrored','Radian
 
 const canvas = document.getElementById('coverCanvas');
 const ctx = canvas.getContext('2d');
-const plate = new Image();
+
 let ready = false;
-plate.onload = function(){ ready = true; draw(performance.now()); };
-plate.src = 'img/shot_cover.webp';
+let loaded = 0;
+METALS.forEach(function(m){
+  m.img = new Image();
+  m.img.onload = function(){
+    if(++loaded === METALS.length){ ready = true; draw(performance.now()); }
+  };
+  m.img.src = m.src;
+});
+
+/* Which render to show, and how far it has turned into the next one.
+ *
+ * Keyed to the metals rather than to the days the renders were photographed.
+ * Keying it to the photographs put the plate 70% of the way to platinum's
+ * render while the label still said Gold, because the two shots are 730 and
+ * 1950 days apart -- the name and the picture disagreed.
+ *
+ * The crossfade runs across the last of the metal's seven steps, which is the
+ * step the app itself uses to carry one metal into the next. So the plate is
+ * simply this metal for six sevenths of it, and turns into the next across
+ * the seventh. */
+const CARRY = 6/7;
+function plateAt(days){
+  let i = 0;
+  for(let k=0;k<METALS.length;k++){ if(days >= METALS[k].start) i = k; }
+  if(i === METALS.length - 1) return {i:i, f:0};
+  const span = METALS[i+1].start - METALS[i].start;
+  const t = (days - METALS[i].start) / span;
+  return {i:i, f: t <= CARRY ? 0 : (t - CARRY) / (1 - CARRY)};
+}
 
 const daysInput = document.getElementById('days');
 const metalName = document.getElementById('metalName');
@@ -782,7 +816,7 @@ function sampleGlints(){
   const off = document.createElement('canvas');
   off.width = 96; off.height = 200;
   const octx = off.getContext('2d', {willReadFrequently:true});
-  octx.drawImage(plate, 0, 0, off.width, off.height);
+  octx.drawImage(METALS[METALS.length-1].img, 0, 0, off.width, off.height);
   const data = octx.getImageData(0,0,off.width,off.height).data;
   for(let y=0;y<off.height;y+=2){
     for(let x=0;x<off.width;x+=2){
@@ -801,22 +835,25 @@ function draw(t){
   const w = canvas.width, h = canvas.height;
   if(!glints.length){ try{ sampleGlints(); }catch(e){ glints=[]; } }
 
-  ctx.clearRect(0,0,w,h);
-  ctx.drawImage(plate,0,0,w,h);
-
   const m = current.metal;
   const worked = 0.35 + 0.65*(current.step/6);
 
-  // The metal itself, laid over the plate.
-  ctx.globalCompositeOperation = 'color';
-  ctx.fillStyle = 'rgb('+m.tint[0]+','+m.tint[1]+','+m.tint[2]+')';
-  ctx.globalAlpha = 0.82;
-  ctx.fillRect(0,0,w,h);
+  // The plate itself: the render for this point on the ladder, crossfading
+  // into the next so the metals run into one another instead of snapping.
+  const at = plateAt(current.days);
+  ctx.clearRect(0,0,w,h);
+  ctx.globalAlpha = 1;
+  ctx.drawImage(METALS[at.i].img,0,0,w,h);
+  if(at.f > 0 && at.i < METALS.length-1){
+    ctx.globalAlpha = at.f;
+    ctx.drawImage(METALS[at.i+1].img,0,0,w,h);
+  }
 
-  // Worked steps read as depth of polish, not as a different colour.
+  // The seven steps inside a metal, as depth of polish rather than colour --
+  // the renders are one point each, so this is what fills in between them.
   ctx.globalCompositeOperation = 'overlay';
-  ctx.globalAlpha = 0.18 + 0.42*worked;
-  ctx.fillStyle = 'rgb('+m.tint[0]+','+m.tint[1]+','+m.tint[2]+')';
+  ctx.globalAlpha = 0.10 + 0.26*worked;
+  ctx.fillStyle = 'rgb(255,248,230)';
   ctx.fillRect(0,0,w,h);
 
   ctx.globalCompositeOperation = 'source-over';
