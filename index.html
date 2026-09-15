@@ -725,12 +725,12 @@ keylist.addEventListener('mouseleave', function(){ if(activeRule === null) showR
 /* ── The living cover ────────────────────────────────────────────────────
    The same artwork the app draws, lit the same way: a slow breath, a gleam
    that crosses, and glints that fire where the metal actually catches. The
-   metal is a tint over the plate, which is why dragging the scrubber walks
-   it from iron to platinum.                                              */
+   plate is the app's own render for that point on the ladder, crossfading
+   into the next, which is what dragging the scrubber walks through.      */
 /* Each metal's start is the running day total at which it is reached -- the
    same numbers the app keeps in metalStarts -- and `days` is how long it then
-   lasts, which is simply the distance to the next one. The ladder ends at
-   2190, where the app's lastCoverDay puts it. */
+   lasts, which is simply the distance to the next one. The ladder ends where
+   the app's lastCoverDay puts it. */
 const LAST_DAY = 1643;
 /* `shot` is the day each render was photographed, which is what the scrubber
    walks between. The plate used to be one gold image tinted per metal, and a
