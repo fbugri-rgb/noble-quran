@@ -323,11 +323,11 @@
           <span class="scrub-metal" id="metalName">Iron</span>
           <span class="scrub-step" id="stepName">Raw · day 1</span>
         </div>
-        <input id="days" type="range" min="0" max="2190" value="620" step="1"
+        <input id="days" type="range" min="0" max="1643" value="460" step="1"
                aria-label="Days read, to see how the cover changes">
         <p class="scrub-caption">Drag to walk the cover through five metals and seven worked
           steps each — thirty-five stages in all. Bronze at a month, silver at three,
-          gold at a year, platinum at three.</p>
+          gold at a year, platinum at eighteen months.</p>
       </div>
     </div>
 
@@ -449,7 +449,7 @@
       <h2>Five metals, thirty-five stages</h2>
       <p class="lede">The app opens on a book, not a menu, and the book is worked by reading.
         Iron from the first day, bronze at a month, silver at three, gold at a year and
-        platinum at three. Choose one to bring it forward.</p>
+        platinum at eighteen months. Choose one to bring it forward.</p>
     </div>
 
     <div class="fan" id="fan">
@@ -471,7 +471,7 @@
       </button>
       <button class="fan-card" data-metal="platinum" style="--i:4" aria-label="Platinum">
         <span class="fan-phone"><img src="img/cover_platinum.webp" alt=""></span>
-        <span class="fan-label"><b>Platinum</b><i>from day 1,095</i></span>
+        <span class="fan-label"><b>Platinum</b><i>from day 548</i></span>
       </button>
     </div>
 
@@ -731,7 +731,7 @@ keylist.addEventListener('mouseleave', function(){ if(activeRule === null) showR
    same numbers the app keeps in metalStarts -- and `days` is how long it then
    lasts, which is simply the distance to the next one. The ladder ends at
    2190, where the app's lastCoverDay puts it. */
-const LAST_DAY = 2190;
+const LAST_DAY = 1643;
 /* `shot` is the day each render was photographed, which is what the scrubber
    walks between. The plate used to be one gold image tinted per metal, and a
    tint cannot put light into the Name: at platinum the app lifts the
@@ -740,11 +740,11 @@ const LAST_DAY = 2190;
    are the app's own renders, so whatever the cover does at that day is in
    the picture already. */
 const METALS = [
-  {name:'Iron',     start:0,    shot:15,   src:'img/cover_iron.webp',     gleam:.42},
-  {name:'Bronze',   start:30,   shot:60,   src:'img/cover_bronze.webp',   gleam:.60},
-  {name:'Silver',   start:90,   shot:227,  src:'img/cover_silver.webp',   gleam:.80},
-  {name:'Gold',     start:365,  shot:730,  src:'img/cover_gold.webp',     gleam:.95},
-  {name:'Platinum', start:1095, shot:1950, src:'img/cover_platinum.webp', gleam:1.10}
+  {name:'Iron',     start:0,    shot:13,   src:'img/cover_iron.webp',     gleam:.42},
+  {name:'Bronze',   start:30,   shot:56,   src:'img/cover_bronze.webp',   gleam:.60},
+  {name:'Silver',   start:90,   shot:208,  src:'img/cover_silver.webp',   gleam:.80},
+  {name:'Gold',     start:365,  shot:443,  src:'img/cover_gold.webp',     gleam:.95},
+  {name:'Platinum', start:548,  shot:1350, src:'img/cover_platinum.webp', gleam:1.10}
 ];
 METALS.forEach(function(m,i){
   m.days = (i === METALS.length - 1 ? LAST_DAY : METALS[i+1].start) - m.start;
