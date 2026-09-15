@@ -850,9 +850,14 @@ function draw(t){
   }
 
   // The seven steps inside a metal, as depth of polish rather than colour --
-  // the renders are one point each, so this is what fills in between them.
+  // the renders are one point each, so this fills in between them.
+  //
+  // Held very low. The old fill was the metal's own tint, which for iron was
+  // a mid grey and so came out near neutral; a warm white in its place at the
+  // same weight lifted raw iron to ivory. The plate's colour is the render's
+  // business now, and this only has to say how far it has been worked.
   ctx.globalCompositeOperation = 'overlay';
-  ctx.globalAlpha = 0.10 + 0.26*worked;
+  ctx.globalAlpha = 0.03 + 0.10*worked;
   ctx.fillStyle = 'rgb(255,248,230)';
   ctx.fillRect(0,0,w,h);
 
