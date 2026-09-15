@@ -32,7 +32,18 @@ html{scroll-behavior:smooth}
 
 body{
   margin:0;
-  background:var(--ox-deep);
+  /* The same arabesque the app works into its leather bars, baked into the
+     site's own oxblood rather than laid over it: a fixed, blended overlay
+     turned out to composite above the content and take the whole page down
+     with it. As a plain background there is nothing to get wrong.
+
+     Fixed, so the page moves over the texture the way a page moves over a
+     desk. */
+  background-color:var(--ox-deep);
+  background-image:url('img/ground.webp');
+  background-repeat:repeat;
+  background-size:300px auto;
+  background-attachment:fixed;
   color:var(--ink);
   font-family:var(--text);
   font-weight:300;
@@ -42,34 +53,6 @@ body{
 }
 a{color:inherit}
 img{max-width:100%;display:block}
-
-/* ─── The ground ────────────────────────────────────────────────────────────
-   The same arabesque the app works into its leather bars, tiled behind the
-   whole page so the oxblood reads as a worked surface rather than a flat
-   fill.
-
-   Fixed rather than scrolled: the page moves over the texture the way a page
-   moves over a desk. Blended as soft-light and held very low, so it takes the
-   oxblood's own colour instead of laying brown over it -- the tile is a
-   photograph of gold on brown leather, and at any real opacity it would drag
-   the whole site warm.                                                      */
-body::before{
-  content:'';
-  position:fixed;
-  inset:0;
-  z-index:-1;
-  pointer-events:none;
-  background-image:url('img/ornament.webp');
-  background-repeat:repeat;
-  background-size:340px auto;
-  mix-blend-mode:soft-light;
-  opacity:.14;
-}
-/* Safari and Firefox both honour soft-light, but a browser that does not
-   would show the tile at full brown. Opacity alone is the safe fallback. */
-@supports not (mix-blend-mode:soft-light){
-  body::before{opacity:.05}
-}
 
 .folio{width:var(--folio);margin-inline:auto}
 
