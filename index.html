@@ -163,9 +163,16 @@
    them, so it can add a layer without swapping an image. */
 .mushaf{position:absolute;inset:0;background:#efe3c8;color:#2b2317;
   display:flex;flex-direction:column;font-family:var(--display);overflow:hidden}
+/* The leather bars carry the app's arabesque, worked into them and held
+   low -- the same image, at the same weight, that the app uses. Without it
+   this mock stopped looking like the thing it is standing in for. */
 .mushaf-head{flex:none;display:flex;align-items:center;justify-content:space-between;
   gap:.5em;padding:calc(var(--w,270px)/6.6) .9em .5em;
-  background:linear-gradient(180deg,#3b2f1d,#2b2317);
+  background-color:#33291a;
+  background-image:linear-gradient(180deg,rgba(59,47,29,.92),rgba(43,35,23,.92)),
+    url('img/ornament.webp');
+  background-size:auto,120px auto;
+  background-repeat:no-repeat,repeat;
   color:#e8d6a8;font-size:.42rem}
 .mushaf-title{font-size:1.5em}
 .mushaf-back,.mushaf-juz{opacity:.75;font-size:1.2em}
@@ -174,12 +181,17 @@
   max-height:0;padding-block:0;border-width:0;overflow:hidden;
   transition:max-height .4s ease,padding .4s ease,border-width .4s ease}
 .mushaf.has-band .mushaf-band{max-height:8em;padding-block:.85em;border-width:1px}
-.mushaf-body{flex:1;overflow:hidden;padding:.55rem .75rem}
+.mushaf-body{flex:1;overflow:hidden;padding:.55rem .75rem;position:relative}
 .mushaf-heading{margin:0 0 .6rem;padding:.5rem .4rem;text-align:center;border-radius:.3rem;
   background:linear-gradient(180deg,#e8d6a2,#d9c079);border:1px solid #a8842f;
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
 .mushaf-heading span{font-size:.72rem;color:#3a2c0f;direction:rtl}
-.mushaf-bar{flex:none;height:2.6rem;background:linear-gradient(180deg,#3b2f1d,#241d12);
+.mushaf-bar{flex:none;height:2.6rem;
+  background-color:#2e2517;
+  background-image:linear-gradient(180deg,rgba(59,47,29,.92),rgba(36,29,18,.92)),
+    url('img/ornament.webp');
+  background-size:auto,120px auto;
+  background-repeat:no-repeat,repeat;
   border-top:1px solid #b08d3e;display:flex;align-items:center;justify-content:space-evenly}
 .mushaf-bar span{width:.62rem;height:.62rem;border-radius:.16rem;background:#cbab63;opacity:.75}
 .mushaf-bar .mb-prev,.mushaf-bar .mb-next{width:.5rem;height:.5rem;transform:rotate(45deg);border-radius:.08rem}
@@ -286,6 +298,7 @@
       <a href="#cover">The cover</a>
       <a href="#makharij">Makharij</a>
       <a href="#study">Study</a>
+      <a href="support.html#contact">Support</a>
     </nav>
     <a class="btn btn-gold" href="#get">Get the app</a>
   </div>
@@ -310,10 +323,11 @@
           <span class="scrub-metal" id="metalName">Iron</span>
           <span class="scrub-step" id="stepName">Raw · day 1</span>
         </div>
-        <input id="days" type="range" min="0" max="2675" value="1180" step="1"
+        <input id="days" type="range" min="0" max="2190" value="620" step="1"
                aria-label="Days read, to see how the cover changes">
         <p class="scrub-caption">Drag to walk the cover through five metals and seven worked
-          steps each — thirty-five stages in all.</p>
+          steps each — thirty-five stages in all. Bronze at a month, silver at three,
+          gold at a year, platinum at three.</p>
       </div>
     </div>
 
@@ -434,8 +448,8 @@
     <div class="cover-head">
       <h2>Five metals, thirty-five stages</h2>
       <p class="lede">The app opens on a book, not a menu, and the book is worked by reading.
-        Iron from the first day, platinum from the one thousand five hundred and eightieth.
-        Choose one to bring it forward.</p>
+        Iron from the first day, bronze at a month, silver at three, gold at a year and
+        platinum at three. Choose one to bring it forward.</p>
     </div>
 
     <div class="fan" id="fan">
@@ -449,15 +463,15 @@
       </button>
       <button class="fan-card" data-metal="silver" style="--i:2" aria-label="Silver">
         <span class="fan-phone"><img src="img/cover_silver.webp" alt=""></span>
-        <span class="fan-label"><b>Silver</b><i>from day 120</i></span>
+        <span class="fan-label"><b>Silver</b><i>from day 90</i></span>
       </button>
       <button class="fan-card is-active" data-metal="gold" style="--i:3" aria-label="Gold">
         <span class="fan-phone"><img src="img/cover_gold.webp" alt=""></span>
-        <span class="fan-label"><b>Gold</b><i>from day 485</i></span>
+        <span class="fan-label"><b>Gold</b><i>from day 365</i></span>
       </button>
       <button class="fan-card" data-metal="platinum" style="--i:4" aria-label="Platinum">
         <span class="fan-phone"><img src="img/cover_platinum.webp" alt=""></span>
-        <span class="fan-label"><b>Platinum</b><i>from day 1,580</i></span>
+        <span class="fan-label"><b>Platinum</b><i>from day 1,095</i></span>
       </button>
     </div>
 
@@ -546,8 +560,27 @@
       who was reading what.</p>
     <div style="display:flex;gap:.9rem;justify-content:center;flex-wrap:wrap;margin-top:1.6rem">
       <a class="btn btn-gold" href="#">Download on the App Store</a>
+      <a class="btn btn-quiet" href="support.html#contact">Support &amp; feedback</a>
       <a class="btn btn-quiet" href="privacy.html">Read the privacy policy</a>
     </div>
+
+    <!-- Both platforms, said plainly. These are drawn marks, not the official
+         App Store and Google Play badges: those have their own artwork and
+         rules, and neither may be shown until the app is actually listed. -->
+    <ul class="platforms" aria-label="Supported platforms">
+      <li>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M16.4 12.7c0-2.2 1.8-3.3 1.9-3.4-1-1.5-2.6-1.7-3.2-1.7-1.4-.1-2.7.8-3.3.8-.7 0-1.7-.8-2.8-.8-1.5 0-2.8.8-3.6 2.1-1.5 2.7-.4 6.6 1.1 8.8.7 1 1.6 2.2 2.7 2.2 1.1 0 1.5-.7 2.8-.7 1.3 0 1.6.7 2.8.7 1.2 0 1.9-1.1 2.6-2.1.8-1.2 1.2-2.4 1.2-2.4s-2.2-.9-2.2-3.5zM14.3 5.9c.6-.7 1-1.7.9-2.7-.9 0-2 .6-2.6 1.3-.6.6-1.1 1.7-.9 2.6 1 .1 2-.5 2.6-1.2z"/>
+        </svg>
+        <span>iPhone &amp; iPad</span>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M6.2 9.3h11.6v7.4a1 1 0 0 1-1 1h-.9v2.5a1.2 1.2 0 1 1-2.4 0v-2.5h-2.6v2.5a1.2 1.2 0 1 1-2.4 0v-2.5h-.9a1 1 0 0 1-1-1V9.3zM4.3 9.6a1.2 1.2 0 0 1 1.2 1.2v4.3a1.2 1.2 0 1 1-2.4 0v-4.3a1.2 1.2 0 0 1 1.2-1.2zm15.4 0a1.2 1.2 0 0 1 1.2 1.2v4.3a1.2 1.2 0 1 1-2.4 0v-4.3a1.2 1.2 0 0 1 1.2-1.2zM8.4 4.2l.9 1.6a5.9 5.9 0 0 1 5.4 0l.9-1.6a.3.3 0 1 1 .5.3l-.9 1.6a5 5 0 0 1 2.6 4H6.2a5 5 0 0 1 2.6-4l-.9-1.6a.3.3 0 1 1 .5-.3zM9.5 7.1a.6.6 0 1 0 0 1.2.6.6 0 0 0 0-1.2zm5 0a.6.6 0 1 0 0 1.2.6.6 0 0 0 0-1.2z"/>
+        </svg>
+        <span>Android</span>
+      </li>
+    </ul>
   </div>
 </section>
 
@@ -694,13 +727,21 @@ keylist.addEventListener('mouseleave', function(){ if(activeRule === null) showR
    that crosses, and glints that fire where the metal actually catches. The
    metal is a tint over the plate, which is why dragging the scrubber walks
    it from iron to platinum.                                              */
+/* Each metal's start is the running day total at which it is reached -- the
+   same numbers the app keeps in metalStarts -- and `days` is how long it then
+   lasts, which is simply the distance to the next one. The ladder ends at
+   2190, where the app's lastCoverDay puts it. */
+const LAST_DAY = 2190;
 const METALS = [
-  {name:'Iron',     days:30,   tint:[108,112,120], gleam:.42},
-  {name:'Bronze',   days:90,   tint:[158,104,52],  gleam:.60},
-  {name:'Silver',   days:365,  tint:[206,210,218], gleam:.80},
-  {name:'Gold',     days:1095, tint:[214,170,74],  gleam:.95},
-  {name:'Platinum', days:1095, tint:[236,240,246], gleam:1.10}
+  {name:'Iron',     start:0,    tint:[108,112,120], gleam:.42},
+  {name:'Bronze',   start:30,   tint:[158,104,52],  gleam:.60},
+  {name:'Silver',   start:90,   tint:[206,210,218], gleam:.80},
+  {name:'Gold',     start:365,  tint:[214,170,74],  gleam:.95},
+  {name:'Platinum', start:1095, tint:[236,240,246], gleam:1.10}
 ];
+METALS.forEach(function(m,i){
+  m.days = (i === METALS.length - 1 ? LAST_DAY : METALS[i+1].start) - m.start;
+});
 const STEPS = ['Raw','Cleaned','Filed','Burnished','Polished','Mirrored','Radiant'];
 
 const canvas = document.getElementById('coverCanvas');
@@ -715,14 +756,14 @@ const metalName = document.getElementById('metalName');
 const stepName  = document.getElementById('stepName');
 
 function stateFor(days){
-  let d = days;
+  // Read off the total rather than assembled from spans, so this and the app
+  // cannot drift apart: the metal is the last one whose start has been passed.
+  let metal = METALS[0];
   for(let i=0;i<METALS.length;i++){
-    if(d < METALS[i].days || i === METALS.length-1){
-      const frac = Math.min(0.999, d / METALS[i].days);
-      return {metal:METALS[i], step:Math.floor(frac*7), frac:frac, days:days};
-    }
-    d -= METALS[i].days;
+    if(days >= METALS[i].start) metal = METALS[i];
   }
+  const frac = Math.min(0.999, (days - metal.start) / metal.days);
+  return {metal:metal, step:Math.floor(frac*7), frac:frac, days:days};
 }
 
 let current = stateFor(0);

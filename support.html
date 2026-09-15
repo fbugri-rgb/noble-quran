@@ -38,6 +38,33 @@
     padding:clamp(1.5rem,3vw,2.2rem);margin-top:2.5rem}
   .contact h2{margin-bottom:.5rem}
   .contact p{max-width:52ch}
+
+  #contactForm{margin:1.6rem 0 1.4rem;max-width:36rem}
+  .field{margin-bottom:1.1rem;border:0;padding:0;min-width:0}
+  .field label,.field legend{display:block;margin-bottom:.4rem;color:var(--ink);font-size:.95rem}
+  .hint{color:var(--faint);font-size:.85rem;font-weight:300}
+  .row{display:flex;gap:1rem;flex-wrap:wrap}
+  .row .field{flex:1 1 12rem}
+  input[type=text],input[type=email],textarea{
+    width:100%;
+    background:color-mix(in srgb,var(--ox-deep) 70%,transparent);
+    border:1px solid color-mix(in srgb,var(--gold) 22%,transparent);
+    border-radius:.5rem;
+    color:var(--ink);
+    font-family:var(--text);
+    font-size:1rem;
+    font-weight:300;
+    padding:.7rem .85rem;
+  }
+  input::placeholder,textarea::placeholder{color:color-mix(in srgb,var(--faint) 80%,transparent)}
+  input:focus,textarea:focus{outline:2px solid var(--gold-bright);outline-offset:1px}
+  textarea{resize:vertical;line-height:1.6}
+  .radio{display:inline-flex;align-items:center;gap:.45rem;margin:0 1.1rem .3rem 0;
+    color:var(--body);font-size:.95rem;cursor:pointer}
+  .radio input{accent-color:var(--gold)}
+  .error{color:#e3a2a2;font-size:.9rem;margin:.45rem 0 0}
+  .form-note{max-width:36rem;margin-top:.9rem}
+  .form-note a{color:var(--gold-bright)}
 </style>
 </head>
 <body>
@@ -50,7 +77,7 @@
       <a href="index.html#tajweed">Tajweed</a>
       <a href="index.html#cover">The cover</a>
     </nav>
-    <a class="btn btn-quiet" href="privacy.html">Privacy</a>
+    <a class="btn btn-quiet" href="support.html#contact">Support</a>
   </div>
 </header>
 
@@ -106,12 +133,55 @@
         exactly what is and is not recorded.</p>
     </div>
 
-    <div class="contact">
-      <h2>Still stuck?</h2>
-      <p>Write to <a href="mailto:support@mymawa.com" style="color:var(--gold-bright)">support@mymawa.com</a>. The
-        quickest way is Settings → About → Send feedback in the app itself, which fills in the
-        version, the device and the rest before you start typing — that information is usually
-        the first thing needed to find a problem.</p>
+    <div class="contact" id="contact">
+      <h2>Report a problem, or ask for something</h2>
+      <p>The quickest route is <b>Settings → About → Send feedback</b> in the app itself, which
+        fills in the version, the device and the rest before you start typing — that is usually
+        the first thing needed to find a problem. If you are not at your phone, this does the
+        same job.</p>
+
+      <form id="contactForm" novalidate>
+        <fieldset class="field">
+          <legend>What is this about?</legend>
+          <label class="radio"><input type="radio" name="kind" value="A problem" checked>
+            <span>Something is wrong</span></label>
+          <label class="radio"><input type="radio" name="kind" value="Feedback">
+            <span>An idea or request</span></label>
+          <label class="radio"><input type="radio" name="kind" value="A question">
+            <span>A question</span></label>
+        </fieldset>
+
+        <div class="field">
+          <label for="f-email">Your email <span class="hint">so a reply can reach you</span></label>
+          <input id="f-email" name="email" type="email" autocomplete="email"
+                 placeholder="you@example.com">
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="f-device">Device <span class="hint">optional</span></label>
+            <input id="f-device" name="device" type="text" placeholder="iPhone 15, Pixel 8…">
+          </div>
+          <div class="field">
+            <label for="f-version">App version <span class="hint">optional</span></label>
+            <input id="f-version" name="version" type="text" placeholder="Settings → About">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="f-message">What happened, or what would you like?</label>
+          <textarea id="f-message" name="message" rows="7" required
+                    placeholder="If something went wrong, what you did just before it helps more than anything else."></textarea>
+          <p class="error" id="f-error" hidden>Please write a message first.</p>
+        </div>
+
+        <button class="btn btn-gold" type="submit">Open this in your mail app</button>
+        <p class="hint form-note">This page has no server and collects nothing. The button
+          composes the message in your own mail app, addressed to
+          <a href="mailto:support@mymawa.com">support@mymawa.com</a> — nothing is sent until you
+          send it, and nothing reaches this site at all.</p>
+      </form>
+
       <p>If you would rather report it in the open, there is an
         <a href="https://github.com/fbugri-rgb/noble-quran/issues" style="color:var(--gold-bright)">issue tracker</a>.</p>
     </div>
@@ -129,6 +199,43 @@
     </nav>
   </div>
 </footer>
+
+<script>
+/* No backend: this is a static page. The form composes the message in the
+   reader's own mail app instead of posting anywhere, so nothing is collected
+   here and nothing leaves the machine until they press send in their client.
+ *
+ * encodeURIComponent, not URLSearchParams: the latter is form encoding, where
+ * a space becomes "+". In a mailto body that is what the reader sees, and the
+ * app's own feedback link had exactly that bug once already.
+ */
+(function(){
+  var form = document.getElementById('contactForm');
+  if(!form) return;
+  var error = document.getElementById('f-error');
+
+  form.addEventListener('submit', function(event){
+    event.preventDefault();
+    var message = form.message.value.trim();
+    if(!message){
+      error.hidden = false;
+      form.message.focus();
+      return;
+    }
+    error.hidden = true;
+
+    var kind = form.querySelector('input[name=kind]:checked').value;
+    var lines = [message, '', '—'];
+    if(form.device.value.trim())  lines.push('Device: ' + form.device.value.trim());
+    if(form.version.value.trim()) lines.push('App version: ' + form.version.value.trim());
+    if(form.email.value.trim())   lines.push('Reply to: ' + form.email.value.trim());
+
+    window.location.href = 'mailto:support@mymawa.com'
+      + '?subject=' + encodeURIComponent('The Noble Quran — ' + kind)
+      + '&body=' + encodeURIComponent(lines.join('\n'));
+  });
+})();
+</script>
 
 </body>
 </html>

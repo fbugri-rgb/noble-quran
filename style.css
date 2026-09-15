@@ -43,6 +43,34 @@ body{
 a{color:inherit}
 img{max-width:100%;display:block}
 
+/* ─── The ground ────────────────────────────────────────────────────────────
+   The same arabesque the app works into its leather bars, tiled behind the
+   whole page so the oxblood reads as a worked surface rather than a flat
+   fill.
+
+   Fixed rather than scrolled: the page moves over the texture the way a page
+   moves over a desk. Blended as soft-light and held very low, so it takes the
+   oxblood's own colour instead of laying brown over it -- the tile is a
+   photograph of gold on brown leather, and at any real opacity it would drag
+   the whole site warm.                                                      */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background-image:url('img/ornament.webp');
+  background-repeat:repeat;
+  background-size:340px auto;
+  mix-blend-mode:soft-light;
+  opacity:.14;
+}
+/* Safari and Firefox both honour soft-light, but a browser that does not
+   would show the tile at full brown. Opacity alone is the safe fallback. */
+@supports not (mix-blend-mode:soft-light){
+  body::before{opacity:.05}
+}
+
 .folio{width:var(--folio);margin-inline:auto}
 
 /* The page is set as a folio: a wide text column with a narrow margin beside
@@ -104,3 +132,21 @@ footer{padding:3rem 0 4rem;color:var(--faint);font-size:.92rem}
 .foot a{text-decoration:none}
 .foot a:hover{color:var(--gold-bright)}
 
+
+
+/* ─── Platforms ────────────────────────────────────────────────────────────
+   Drawn marks rather than the official store badges: those carry their own
+   artwork and rules, and neither may be shown before the app is listed. */
+.platforms{
+  list-style:none;
+  margin:1.6rem 0 0;
+  padding:0;
+  display:flex;
+  gap:2rem;
+  justify-content:center;
+  flex-wrap:wrap;
+  color:var(--faint);
+  font-size:.95rem;
+}
+.platforms li{display:flex;align-items:center;gap:.55rem}
+.platforms svg{width:1.3rem;height:1.3rem;fill:var(--gold-dim);flex:none}
