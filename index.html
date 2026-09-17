@@ -323,7 +323,7 @@
           <span class="scrub-metal" id="metalName">Iron</span>
           <span class="scrub-step" id="stepName">Raw · day 1</span>
         </div>
-        <input id="days" type="range" min="0" max="1643" value="460" step="1"
+        <input id="days" type="range" min="0" max="1000" value="704" step="1"
                aria-label="Days read, to see how the cover changes">
         <p class="scrub-caption">Drag to walk the cover through five metals and seven worked
           steps each — thirty-five stages in all. Bronze at a month, silver at three,
@@ -800,11 +800,25 @@ function stateFor(days){
   return {metal:metal, step:Math.floor(frac*7), frac:frac, days:days};
 }
 
+/* The track gives every metal the same width, not every day. The metals last
+   30, 60, 275, 183 and 1095 days, so a track in days put iron and bronze
+   together in its first twentieth and gave platinum two thirds of it. Within
+   a metal the days still run evenly, so the day shown is the real one. */
+const SLOT = 1000 / METALS.length;
+function dayAt(pos){
+  const i = Math.min(METALS.length - 1, Math.floor(pos / SLOT));
+  const t = (pos - i*SLOT) / SLOT;
+  return Math.min(LAST_DAY, Math.floor(METALS[i].start + t*METALS[i].days));
+}
+
 let current = stateFor(0);
 function readScrub(){
-  current = stateFor(+daysInput.value);
+  const day = dayAt(+daysInput.value);
+  current = stateFor(day);
   metalName.textContent = current.metal.name;
-  stepName.textContent = STEPS[current.step] + ' · day ' + (+daysInput.value + 1).toLocaleString();
+  stepName.textContent = STEPS[current.step] + ' · day ' + (day + 1).toLocaleString();
+  daysInput.setAttribute('aria-valuetext',
+    current.metal.name + ', ' + STEPS[current.step] + ', day ' + (day + 1).toLocaleString());
   daysInput.style.setProperty('--pct', (daysInput.value / daysInput.max * 100) + '%');
 }
 daysInput.addEventListener('input', function(){ readScrub(); if(reduced) draw(performance.now()); });
